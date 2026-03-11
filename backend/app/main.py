@@ -15,8 +15,34 @@ load_dotenv()
 
 app = FastAPI(
     title="Sales Insight Automator",
-    description="Upload a sales CSV/XLSX and get an AI-generated executive summary sent to your inbox.",
-    version="1.0.0",
+    description=(
+        "## Sales Insight Automator\n\n"
+        "Upload a `.csv` or `.xlsx` sales file and a recipient email address. "
+        "The API parses the data with **pandas**, generates an executive summary using "
+        "**Groq `llama-3.3-70b-versatile`** (replaces the earlier Gemini integration), "
+        "and delivers the report to the provided inbox via **Gmail SMTP**.\n\n"
+        "### Live base URL\n"
+        "`http://localhost:8000`\n\n"
+        "### Authentication\n"
+        "No auth required for local/dev use. Set `GROQ_API_KEY` and SMTP vars in `backend/.env`.\n\n"
+        "### Rate limit\n"
+        "`POST /api/v1/upload` — **5 requests / minute / IP**.\n\n"
+        "### LLM provider\n"
+        "| Field | Value |\n"
+        "|---|---|\n"
+        "| Provider | Groq Cloud |\n"
+        "| Model | llama-3.3-70b-versatile |\n"
+        "| Env var | `GROQ_API_KEY` |\n"
+        "| Free tier | 14 400 RPD · 30 RPM |"
+    ),
+    version="1.1.0",
+    contact={
+        "name": "Rabbitt AI — Ayush Chauhan",
+        "email": "ayushchauhan1164@gmail.com",
+    },
+    servers=[
+        {"url": "http://localhost:8000", "description": "Local development server"},
+    ],
     redoc_url=None,
     swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"},
 )

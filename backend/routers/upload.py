@@ -25,7 +25,25 @@ router = APIRouter()
     "/api/v1/upload",
     response_model=UploadResponse,
     summary="Upload sales data and trigger an AI summary email",
+    description=(
+        "Accepts a `.csv` or `.xlsx` sales file (max **10 MB**) and a recipient email address.\n\n"
+        "**Pipeline:**\n"
+        "1. Validates file extension and MIME type\n"
+        "2. Parses data with pandas → computes revenue/unit/region/category aggregates\n"
+        "3. Sends aggregates to **Groq `llama-3.3-70b-versatile`** for an executive summary\n"
+        "4. Emails the formatted HTML report via **Gmail SMTP** (STARTTLS · port 587)\n\n"
+        "**Rate limit:** 5 requests / minute / IP\n\n"
+        "**Accepted MIME types:** `text/csv`, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`, "
+        "`application/vnd.ms-excel`, `application/octet-stream`"
+    ),
     tags=["Upload"],
+    responses={
+        200: {"description": "Summary generated and email delivered successfully."},
+        413: {"description": "File exceeds the 10 MB size limit."},
+        422: {"description": "Unsupported file type or invalid email address."},
+        429: {"description": "Rate limit exceeded — max 5 requests per minute per IP."},
+        500: {"description": "Internal error during parsing, LLM call, or email delivery."},
+    },
 )
 @limiter.limit("5/minute")
 async def upload_sales_file(
