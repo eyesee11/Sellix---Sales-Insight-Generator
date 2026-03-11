@@ -31,7 +31,7 @@ router = APIRouter()
         "1. Validates file extension and MIME type\n"
         "2. Parses data with pandas → computes revenue/unit/region/category aggregates\n"
         "3. Sends aggregates to **Groq `llama-3.3-70b-versatile`** for an executive summary\n"
-        "4. Emails the formatted HTML report via **Gmail SMTP** (STARTTLS · port 587)\n\n"
+        "4. Emails the formatted HTML report via **Resend** transactional email API\n\n"
         "**Rate limit:** 5 requests / minute / IP\n\n"
         "**Accepted MIME types:** `text/csv`, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`, "
         "`application/vnd.ms-excel`, `application/octet-stream`"
