@@ -51,7 +51,7 @@ export default function HomePage() {
               alt="Sellix logo"
               width={64}
               height={64}
-            //   className="border-2 border-ink shadow-[2px_2px_0_#0a0a0a] group-hover:shadow-none group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all duration-100"
+              //   className="border-2 border-ink shadow-[2px_2px_0_#0a0a0a] group-hover:shadow-none group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all duration-100"
             />
             <span className="font-black text-sm uppercase tracking-swiss">
               Sellix
@@ -80,7 +80,7 @@ export default function HomePage() {
 
           {/* CTA */}
           <a
-            href="http://localhost:8000/docs"
+            href="https://sellix-sales-insight-generator.onrender.com/docs"
             target="_blank"
             rel="noopener noreferrer"
             className="text-[11px] font-black uppercase tracking-swiss border-2 border-ink px-3 py-1.5
@@ -354,7 +354,7 @@ export default function HomePage() {
 
             <div className="flex items-center gap-4">
               <a
-                href="http://localhost:8000/docs"
+                href="https://sellix-sales-insight-generator.onrender.com/docs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[11px] font-black uppercase tracking-swiss border border-paper/20 px-3 py-1.5
@@ -363,7 +363,7 @@ export default function HomePage() {
                 Swagger UI ↗
               </a>
               <a
-                href="http://localhost:8000/redoc"
+                href="https://sellix-sales-insight-generator.onrender.com/redoc"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[11px] font-black uppercase tracking-swiss border border-paper/20 px-3 py-1.5

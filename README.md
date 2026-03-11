@@ -3,6 +3,8 @@
 > Upload a `.csv` or `.xlsx` sales file, get an AI-generated executive summary delivered straight to your inbox — powered by **Groq LLaMA 3.3** and **Gmail SMTP**.
 > Built for Rabbitt AI's Cloud DevOps Engineering sprint.
 
+**Live:** [Frontend](https://sellix-sales-insight-generator.vercel.app) · [Swagger UI](https://sellix-sales-insight-generator.onrender.com/docs) · [ReDoc](https://sellix-sales-insight-generator.onrender.com/redoc) · [Health](https://sellix-sales-insight-generator.onrender.com/health)
+
 ---
 
 ## Screenshots
@@ -58,7 +60,9 @@ Recipient's inbox ✓
 
 ## API endpoints
 
-Base URL (local): `http://localhost:8000`
+**Production base URL:** `https://sellix-sales-insight-generator.onrender.com`
+
+**Local base URL:** `http://localhost:8000`
 
 | Method | Path             | Description                                        |
 | ------ | ---------------- | -------------------------------------------------- |
@@ -157,13 +161,13 @@ docker compose down --volumes --rmi all
 
 Once running:
 
-| Service      | URL                          |
-| ------------ | ---------------------------- |
-| Frontend     | http://localhost:3000        |
-| Backend API  | http://localhost:8000        |
-| Swagger UI   | http://localhost:8000/docs   |
-| ReDoc        | http://localhost:8000/redoc  |
-| Health check | http://localhost:8000/health |
+| Service      | Local                        | Production                                                 |
+| ------------ | ---------------------------- | ---------------------------------------------------------- |
+| Frontend     | http://localhost:3000        | https://sellix-sales-insight-generator.vercel.app          |
+| Backend API  | http://localhost:8000        | https://sellix-sales-insight-generator.onrender.com        |
+| Swagger UI   | http://localhost:8000/docs   | https://sellix-sales-insight-generator.onrender.com/docs   |
+| ReDoc        | http://localhost:8000/redoc  | https://sellix-sales-insight-generator.onrender.com/redoc  |
+| Health check | http://localhost:8000/health | https://sellix-sales-insight-generator.onrender.com/health |
 
 ---
 

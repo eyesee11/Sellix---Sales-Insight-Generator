@@ -22,7 +22,8 @@ app = FastAPI(
         "**Groq `llama-3.3-70b-versatile`** (replaces the earlier Gemini integration), "
         "and delivers the report to the provided inbox via **Gmail SMTP**.\n\n"
         "### Live base URL\n"
-        "`http://localhost:8000`\n\n"
+        "**Production:** `https://sellix-sales-insight-generator.onrender.com`\n\n"
+        "**Local dev:** `http://localhost:8000`\n\n"
         "### Authentication\n"
         "No auth required for local/dev use. Set `GROQ_API_KEY` and SMTP vars in `backend/.env`.\n\n"
         "### Rate limit\n"
@@ -41,7 +42,8 @@ app = FastAPI(
         "email": "ayushchauhan1164@gmail.com",
     },
     servers=[
-        {"url": "http://localhost:8000", "description": "Local development server"},
+        {"url": "https://sellix-sales-insight-generator.onrender.com", "description": "Production (Render)"},
+        {"url": "http://localhost:8000", "description": "Local development"},
     ],
     redoc_url=None,
     swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"},
@@ -52,7 +54,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[os.getenv("FRONTEND_URL", "http://localhost:3000")],
+    allow_origins=os.getenv("FRONTEND_URL", "http://localhost:3000").split(","),
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
