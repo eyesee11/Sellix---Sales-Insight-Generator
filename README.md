@@ -119,9 +119,10 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=you@gmail.com
 SMTP_PASSWORD=xxxx xxxx xxxx xxxx    # Gmail App Password — NOT your login password
-FRONTEND_URL=http://localhost:3000   # CORS allowlist — change to your deployed URL in prod
-NEXT_PUBLIC_API_URL=http://localhost:8000
+FRONTEND_URL=http://localhost:3000   # CORS allowlist — change to your Vercel URL in prod
 ```
+
+> **`NEXT_PUBLIC_API_URL`** is a **frontend** env var. Set it in the Vercel dashboard (Project Settings → Environment Variables) — it is **not** read by the backend and should not be in `backend/.env`.
 
 > **Gmail App Password:** Google Account → Security → 2-Step Verification → App Passwords → "Other (custom name)" → copy the 16-char password.
 
