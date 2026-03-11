@@ -11,12 +11,12 @@ export default function HomePage() {
               Sales Insight Automator
             </h1>
             <p className="text-blue-100 text-sm font-bold mt-1">
-              Rabbitt AI — Internal Sprint Tool
+              Sellix - Rabbitt AI Internal Tool
             </p>
           </div>
           <div className="bg-white border-2 border-black px-3 py-1 shadow-[3px_3px_0px_#000]">
             <span className="text-xs font-black text-blue-600 uppercase tracking-widest">
-              Powered by Gemini
+              Powered by Groq
             </span>
           </div>
         </div>

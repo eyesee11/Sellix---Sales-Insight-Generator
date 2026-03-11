@@ -1,13 +1,15 @@
 import os
 
-import google.generativeai as genai
+from dotenv import load_dotenv
+from groq import Groq
 
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-_model = genai.GenerativeModel("gemini-1.5-flash")
+load_dotenv()
+
+_client = Groq(api_key=os.environ["GROQ_API_KEY"])
+_MODEL = "llama-3.3-70b-versatile"
 
 
 def _safe(val) -> str:
-    """Strip newlines from CSV-sourced strings to prevent prompt injection."""
     return str(val).replace("\n", " ").replace("\r", " ")[:200]
 
 
@@ -46,5 +48,10 @@ Write a polished 3-4 paragraph executive summary. Lead with the headline number,
 and category standouts, flag any operational concerns (e.g. cancellations), and close with a brief \
 forward-looking remark. Use exact figures. Keep the tone confident and data-driven — no filler phrases."""
 
-    response = _model.generate_content(prompt)
-    return response.text
+    response = _client.chat.completions.create(
+        model=_MODEL,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3,
+        max_tokens=600,
+    )
+    return response.choices[0].message.content
