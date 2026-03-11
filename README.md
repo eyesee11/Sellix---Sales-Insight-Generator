@@ -1,6 +1,6 @@
 # Sales Insight Automator
 
-> Upload a `.csv` or `.xlsx` sales file, get an AI-generated executive summary delivered straight to your inbox — powered by **Groq LLaMA 3.3** and **Gmail SMTP**.
+> Upload a `.csv` or `.xlsx` sales file, get an AI-generated executive summary delivered straight to your inbox — powered by **Groq LLaMA 3.3** and **Resend**.
 > Built for Rabbitt AI's Cloud DevOps Engineering sprint.
 
 **Live:** [Frontend](https://sellix-sales-insight-generator.vercel.app) · [Swagger UI](https://sellix-sales-insight-generator.onrender.com/docs) · [ReDoc](https://sellix-sales-insight-generator.onrender.com/redoc) · [Health](https://sellix-sales-insight-generator.onrender.com/health)
@@ -37,7 +37,7 @@ FastAPI  ──► pandas parses CSV/XLSX → computes aggregates
 Groq Cloud  (llama-3.3-70b-versatile)
     │  returns executive narrative summary
     ▼
-Gmail SMTP  (STARTTLS · port 587)
+Resend  (transactional email HTTP API)
     │  sends branded HTML email
     ▼
 Recipient's inbox ✓
@@ -52,7 +52,7 @@ Recipient's inbox ✓
 | Frontend   | Next.js 14 (App Router) · TypeScript · Tailwind CSS · react-dropzone |
 | Backend    | FastAPI 0.115 · Python 3.11 · uvicorn · pandas · slowapi             |
 | LLM        | **Groq Cloud** — `llama-3.3-70b-versatile` (14 400 RPD free tier)    |
-| Email      | Gmail SMTP via `aiosmtplib` · STARTTLS port 587 · App Password       |
+| Email      | **Resend** transactional email HTTP API (`resend` Python SDK)        |
 | Containers | Docker · docker-compose (no `version:` key — Docker 26+)             |
 | CI/CD      | GitHub Actions — flake8 · ESLint/tsc · docker-compose build          |
 
@@ -115,16 +115,14 @@ Edit `backend/.env` and fill in every value:
 
 ```env
 GROQ_API_KEY=gsk_...                  # console.groq.com/keys — free account, no card needed
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=you@gmail.com
-SMTP_PASSWORD=xxxx xxxx xxxx xxxx    # Gmail App Password — NOT your login password
+RESEND_API_KEY=re_...                 # resend.com/api-keys — free tier: 100 emails/day
+RESEND_FROM=Sales Insight <onboarding@resend.dev>   # or your verified domain sender
 FRONTEND_URL=http://localhost:3000   # CORS allowlist — change to your Vercel URL in prod
 ```
 
 > **`NEXT_PUBLIC_API_URL`** is a **frontend** env var. Set it in the Vercel dashboard (Project Settings → Environment Variables) — it is **not** read by the backend and should not be in `backend/.env`.
 
-> **Gmail App Password:** Google Account → Security → 2-Step Verification → App Passwords → "Other (custom name)" → copy the 16-char password.
+> **Resend API key:** Sign up at [resend.com](https://resend.com), create an API key, and paste it into `RESEND_API_KEY`. The free tier gives you 100 emails/day with no credit card required. Use `onboarding@resend.dev` as the sender while testing, or add and verify your own domain for a custom sender address.
 
 ---
 
@@ -281,7 +279,7 @@ sellix/
 │   ├── app/
 │   │   ├── main.py          # FastAPI app, CORS, rate limiter, ReDoc
 │   │   ├── ai_service.py    # Groq LLaMA call — builds prompt, returns summary
-│   │   ├── email_service.py # aiosmtplib async Gmail sender
+│   │   ├── email_service.py # Resend transactional email sender
 │   │   ├── file_parser.py   # pandas CSV/XLSX parser → aggregates dict
 │   │   └── limiter.py       # shared slowapi Limiter instance
 │   ├── routers/
@@ -439,41 +437,33 @@ The backend runs as `appuser` (UID > 1000), not `root`.
 backend/.env
 ```
 
-`backend/.env` (which contains `GROQ_API_KEY`, `SMTP_PASSWORD`, etc.) is excluded from git. Only `backend/.env.example` (with placeholder values) is committed.
+`backend/.env` (which contains `GROQ_API_KEY`, `RESEND_API_KEY`, etc.) is excluded from git. Only `backend/.env.example` (with placeholder values) is committed.
 
 > **Lesson learned the hard way:** An earlier iteration accidentally committed the `.env` file. Recovery required `git rm --cached backend/.env` + `git commit --amend` + `git push --force`. Google auto-revoked the leaked Gemini key within minutes. Don't commit secrets.
 
 ---
 
-### 7. Gmail App Password — not your account password
+### 7. Resend API key — scoped transactional email
 
-**What it prevents:** Your primary Google account credentials being exposed in the env file. App Passwords are scoped, revocable, and do not grant access to the full account.
+**What it prevents:** Exposing full email account credentials. Resend API keys are scoped to sending only, easily rotatable, and don't grant access to any mailbox.
 
 **How it's implemented** (`backend/app/email_service.py`):
 
 ```python
-await smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_PASSWORD"])
+import resend
+resend.api_key = os.environ["RESEND_API_KEY"]
+resend.Emails.send({...})
 ```
 
-`SMTP_PASSWORD` should be the 16-character App Password from Google Account → Security → App Passwords — never your login password.
+`RESEND_API_KEY` is a scoped API token from [resend.com](https://resend.com). All communication uses HTTPS — no SMTP ports needed, which also avoids port-blocking issues on platforms like Render's free tier.
 
 ---
 
-### 8. STARTTLS — encrypted SMTP transport
+### 8. Resend HTTPS transport — encrypted by default
 
-**What it prevents:** Email credentials and content being transmitted in plaintext over the network.
+**What it prevents:** Email content being transmitted in plaintext. Unlike SMTP which requires explicit STARTTLS negotiation, Resend's HTTP API uses TLS by default.
 
-**How it's implemented** (`backend/app/email_service.py`):
-
-```python
-async with aiosmtplib.SMTP(
-    hostname=os.environ["SMTP_HOST"],
-    port=int(os.environ["SMTP_PORT"]),   # 587
-    start_tls=True,
-) as smtp:
-```
-
-Port 587 with `start_tls=True` upgrades the connection to TLS before any credentials are sent. Port 25 (plaintext) and port 465 (implicit SSL) are not used.
+**How it's implemented:** The `resend` Python SDK sends all requests over `https://api.resend.com` — encrypted end-to-end with no configuration needed.
 
 ---
 
@@ -488,8 +478,8 @@ Port 587 with `start_tls=True` upgrades the connection to TLS before any credent
 | Pydantic `EmailStr`    | Bad/injected email input          | 422                       |
 | Non-root Docker user   | Container privilege escalation    | —                         |
 | `.env` in `.gitignore` | Secret leakage to git             | —                         |
-| Gmail App Password     | Full account credential exposure  | —                         |
-| SMTP STARTTLS port 587 | Plaintext credential transmission | —                         |
+| Resend API key         | Full account credential exposure  | —                         |
+| Resend HTTPS transport | Plaintext credential transmission | —                         |
 
 ---
 
