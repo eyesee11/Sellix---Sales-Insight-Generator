@@ -5,11 +5,21 @@
 
 ---
 
-## Live demo
+## Screenshots
 
-![Sales Insight Automator — working screenshot](ss/image.png)
+### Hero
 
-_Drop a file, enter an email, hit Analyze — the formatted HTML summary lands in your inbox within seconds._
+![Hero section](ss/hero.png)
+
+### Features
+
+![Features section](ss/features.png)
+
+### Live result — email delivered
+
+![Working end-to-end — summary sent to inbox](ss/image.png)
+
+_Drop a file, enter an email, hit Analyse — the formatted HTML summary lands in your inbox within seconds._
 
 ---
 
