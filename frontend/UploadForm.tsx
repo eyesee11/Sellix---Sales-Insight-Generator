@@ -32,12 +32,9 @@ export default function UploadForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !email) return;
-
     setState("loading");
     setMessage("");
-
     const result = await uploadFile(file, email);
-
     if (result.ok) {
       setState("success");
       setMessage(result.message ?? "Summary sent! Check your inbox.");
@@ -57,104 +54,139 @@ export default function UploadForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="border-4 border-black bg-white shadow-[8px_8px_0px_#000] p-8 max-w-2xl w-full"
+      className="border-2 border-ink bg-white shadow-brutal-xl"
     >
-      {/* File dropzone */}
-      <div
-        {...getRootProps()}
-        className={`border-4 border-dashed border-black p-10 text-center cursor-pointer mb-6 transition-colors
-          ${
-            isDragActive
-              ? "bg-blue-200"
-              : file
-                ? "bg-blue-50"
-                : "bg-white hover:bg-blue-50"
-          }`}
-      >
-        <input {...getInputProps()} />
-        <div className="space-y-2">
-          <div className="text-5xl select-none">📊</div>
-          {file ? (
-            <div>
-              <p className="font-black text-blue-600 text-lg uppercase tracking-tight">
-                {file.name}
-              </p>
-              <p className="text-sm font-bold text-gray-500 mt-1">
-                {(file.size / 1024).toFixed(1)} KB — click or drop to replace
-              </p>
+      {/* Form header bar */}
+      <div className="bg-ink px-6 py-3 flex items-center justify-between">
+        <span className="text-[11px] font-black uppercase tracking-wide2 text-white/60">
+          Sales file upload
+        </span>
+        <span className="text-[10px] font-bold uppercase tracking-swiss text-white/40">
+          .csv · .xlsx · max 10 mb
+        </span>
+      </div>
+
+      <div className="p-6 space-y-5">
+        {/* Dropzone */}
+        <div
+          {...getRootProps()}
+          className={`border-2 border-dashed p-8 text-center cursor-pointer transition-all duration-100
+            ${
+              isDragActive
+                ? "border-accent bg-accent-light"
+                : file
+                  ? "border-accent bg-accent-light/40"
+                  : "border-ink/30 bg-paper hover:border-accent hover:bg-accent-light/20"
+            }`}
+        >
+          <input {...getInputProps()} />
+          <div className="space-y-2">
+            <div className="text-4xl select-none">
+              {file ? "📊" : isDragActive ? "📥" : "📁"}
             </div>
+            {file ? (
+              <div>
+                <p className="font-black text-accent text-sm uppercase tracking-tight">
+                  {file.name}
+                </p>
+                <p className="text-xs font-bold text-gray-400 mt-1">
+                  {(file.size / 1024).toFixed(1)} KB — click or drop to replace
+                </p>
+              </div>
+            ) : (
+              <div>
+                <p className="font-black text-ink text-sm uppercase tracking-tight">
+                  {isDragActive
+                    ? "Drop it. Right now."
+                    : "Drag & drop your file"}
+                </p>
+                <p className="text-xs font-bold text-gray-400 mt-1">
+                  or click to browse
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Email input */}
+        <div>
+          <label className="block font-black text-ink uppercase text-[10px] tracking-wide2 mb-2">
+            Recipient Email
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="exec@rabbitt.ai"
+            required
+            className="w-full border-2 border-ink px-4 py-3 text-sm font-medium text-ink placeholder-gray-300
+                       focus:outline-none focus:border-accent focus:bg-accent-light/20 bg-paper transition-colors"
+          />
+        </div>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={!file || !email || state === "loading"}
+          className="w-full bg-accent text-white font-black uppercase tracking-swiss text-sm
+                     border-2 border-ink py-4 shadow-brutal-lg
+                     hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]
+                     disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:shadow-brutal disabled:translate-x-0 disabled:translate-y-0
+                     transition-all duration-100"
+        >
+          {state === "loading" ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Generating summary…
+            </span>
           ) : (
+            "Analyse & Send →"
+          )}
+        </button>
+
+        {/* Feedback */}
+        {state === "success" && (
+          <div className="border-2 border-ink bg-green-50 px-4 py-4 shadow-brutal flex items-start justify-between gap-4">
             <div>
-              <p className="font-black text-black text-lg uppercase tracking-tight">
-                {isDragActive ? "Drop it here" : "Drag & drop your file"}
+              <p className="font-black text-green-900 uppercase text-xs tracking-swiss">
+                ✅ Done!
               </p>
-              <p className="text-sm font-bold text-gray-500 mt-1">
-                .csv or .xlsx — max 10 MB
+              <p className="text-xs font-medium text-green-800 mt-0.5">
+                {message}
               </p>
             </div>
-          )}
-        </div>
+            <button
+              type="button"
+              onClick={reset}
+              className="font-black text-[10px] uppercase tracking-swiss border-2 border-ink px-2 py-1
+                         hover:bg-ink hover:text-white transition-colors shrink-0"
+            >
+              New
+            </button>
+          </div>
+        )}
+
+        {state === "error" && (
+          <div className="border-2 border-ink bg-red-50 px-4 py-4 shadow-brutal flex items-start justify-between gap-4">
+            <div>
+              <p className="font-black text-red-900 uppercase text-xs tracking-swiss">
+                ❌ Error
+              </p>
+              <p className="text-xs font-medium text-red-800 mt-0.5">
+                {message}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={reset}
+              className="font-black text-[10px] uppercase tracking-swiss border-2 border-ink px-2 py-1
+                         hover:bg-ink hover:text-white transition-colors shrink-0"
+            >
+              Retry
+            </button>
+          </div>
+        )}
       </div>
-
-      {/* Email input */}
-      <div className="mb-6">
-        <label className="block font-black text-black uppercase text-xs tracking-widest mb-2">
-          Recipient Email
-        </label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="exec@rabbitt.ai"
-          required
-          className="w-full border-4 border-black px-4 py-3 font-bold text-black placeholder-gray-400
-                     focus:outline-none focus:bg-blue-50 bg-white shadow-[4px_4px_0px_#000]"
-        />
-      </div>
-
-      {/* Submit */}
-      <button
-        type="submit"
-        disabled={!file || !email || state === "loading"}
-        className="w-full bg-blue-600 text-white font-black uppercase tracking-widest text-base
-                   border-4 border-black py-4 shadow-[6px_6px_0px_#000]
-                   hover:bg-blue-700 hover:shadow-[3px_3px_0px_#000] hover:translate-x-[3px] hover:translate-y-[3px]
-                   disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:shadow-[4px_4px_0px_#000]
-                   transition-all duration-100 active:shadow-none active:translate-x-[6px] active:translate-y-[6px]"
-      >
-        {state === "loading" ? "⏳ Generating summary..." : "Send Summary →"}
-      </button>
-
-      {/* Feedback banners */}
-      {state === "success" && (
-        <div className="mt-6 border-4 border-black bg-green-100 px-5 py-4 shadow-[4px_4px_0px_#000] flex items-start justify-between gap-4">
-          <p className="font-black text-green-900 uppercase text-sm tracking-wide">
-            ✅ {message}
-          </p>
-          <button
-            type="button"
-            onClick={reset}
-            className="font-black text-xs uppercase border-2 border-black px-2 py-1 hover:bg-black hover:text-white transition-colors shrink-0"
-          >
-            New
-          </button>
-        </div>
-      )}
-
-      {state === "error" && (
-        <div className="mt-6 border-4 border-black bg-red-100 px-5 py-4 shadow-[4px_4px_0px_#000] flex items-start justify-between gap-4">
-          <p className="font-black text-red-900 uppercase text-sm tracking-wide">
-            ❌ {message}
-          </p>
-          <button
-            type="button"
-            onClick={reset}
-            className="font-black text-xs uppercase border-2 border-black px-2 py-1 hover:bg-black hover:text-white transition-colors shrink-0"
-          >
-            Retry
-          </button>
-        </div>
-      )}
     </form>
   );
 }
