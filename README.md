@@ -35,3 +35,14 @@ git clone <your-repo-url>
 cd sellix
 cp backend/.env.example backend/.env
 # fill in the values (see .env.example below)
+
+### 2. env.example
+```
+GEMINI_API_KEY=your_gemini_api_key
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_user_name
+SMTP_PASSWORD=your_app_password
+FRONTEND_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
