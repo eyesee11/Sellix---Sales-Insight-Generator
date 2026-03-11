@@ -1,6 +1,6 @@
 # Sales Insight Automator
 
-> Upload a `.csv` or `.xlsx` sales file, get an AI-generated executive summary delivered straight to your inbox — powered by **Groq LLaMA 3.3** and **Resend**.
+> Upload a `.csv` or `.xlsx` sales file, get an AI-generated executive summary delivered straight to your inbox — powered by **Groq LLaMA 3.3** and **Brevo**.
 > Built for Rabbitt AI's Cloud DevOps Engineering sprint.
 
 **Live:** [Frontend](https://sellix-sales-insight-generator.vercel.app) · [Swagger UI](https://sellix-sales-insight-generator.onrender.com/docs) · [ReDoc](https://sellix-sales-insight-generator.onrender.com/redoc) · [Health](https://sellix-sales-insight-generator.onrender.com/health)
@@ -37,7 +37,7 @@ FastAPI  ──► pandas parses CSV/XLSX → computes aggregates
 Groq Cloud  (llama-3.3-70b-versatile)
     │  returns executive narrative summary
     ▼
-Resend  (transactional email HTTP API)
+Brevo  (transactional email HTTP API)
     │  sends branded HTML email
     ▼
 Recipient's inbox ✓
@@ -47,14 +47,14 @@ Recipient's inbox ✓
 
 ## Stack
 
-| Layer      | Tech                                                                 |
-| ---------- | -------------------------------------------------------------------- |
-| Frontend   | Next.js 14 (App Router) · TypeScript · Tailwind CSS · react-dropzone |
-| Backend    | FastAPI 0.115 · Python 3.11 · uvicorn · pandas · slowapi             |
-| LLM        | **Groq Cloud** — `llama-3.3-70b-versatile` (14 400 RPD free tier)    |
-| Email      | **Resend** transactional email HTTP API (`resend` Python SDK)        |
-| Containers | Docker · docker-compose (no `version:` key — Docker 26+)             |
-| CI/CD      | GitHub Actions — flake8 · ESLint/tsc · docker-compose build          |
+| Layer      | Tech                                                                                                 |
+| ---------- | ---------------------------------------------------------------------------------------------------- |
+| Frontend   | Next.js 14 (App Router) · TypeScript · Tailwind CSS · react-dropzone                                 |
+| Backend    | FastAPI 0.115 · Python 3.11 · uvicorn · pandas · slowapi                                             |
+| LLM        | **Groq Cloud** — `llama-3.3-70b-versatile` (14 400 RPD free tier)                                    |
+| Email      | **Brevo** (formerly Sendinblue) transactional email HTTP API — 300 emails/day free, no domain needed |
+| Containers | Docker · docker-compose (no `version:` key — Docker 26+)                                             |
+| CI/CD      | GitHub Actions — flake8 · ESLint/tsc · docker-compose build                                          |
 
 ---
 
@@ -115,14 +115,15 @@ Edit `backend/.env` and fill in every value:
 
 ```env
 GROQ_API_KEY=gsk_...                  # console.groq.com/keys — free account, no card needed
-RESEND_API_KEY=re_...                 # resend.com/api-keys — free tier: 100 emails/day
-RESEND_FROM=Sales Insight <onboarding@resend.dev>   # or your verified domain sender
+BREVO_API_KEY=xkeysib-...             # app.brevo.com/settings/keys/api — free: 300 emails/day
+BREVO_SENDER_EMAIL=you@gmail.com      # must be verified in Brevo dashboard
+BREVO_SENDER_NAME=Sales Insight Automator
 FRONTEND_URL=http://localhost:3000   # CORS allowlist — change to your Vercel URL in prod
 ```
 
 > **`NEXT_PUBLIC_API_URL`** is a **frontend** env var. Set it in the Vercel dashboard (Project Settings → Environment Variables) — it is **not** read by the backend and should not be in `backend/.env`.
 
-> **Resend API key:** Sign up at [resend.com](https://resend.com), create an API key, and paste it into `RESEND_API_KEY`. The free tier gives you 100 emails/day with no credit card required. Use `onboarding@resend.dev` as the sender while testing, or add and verify your own domain for a custom sender address.
+> **Brevo API key:** Sign up at [brevo.com](https://www.brevo.com) (free, no credit card). Go to Settings → SMTP & API → API Keys → Generate. The free tier gives you **300 emails/day**. You only need to verify your sender email (any Gmail works) — **no custom domain required**. Anyone can receive the emails.
 
 ---
 
@@ -279,7 +280,7 @@ sellix/
 │   ├── app/
 │   │   ├── main.py          # FastAPI app, CORS, rate limiter, ReDoc
 │   │   ├── ai_service.py    # Groq LLaMA call — builds prompt, returns summary
-│   │   ├── email_service.py # Resend transactional email sender
+│   │   ├── email_service.py # Brevo transactional email sender
 │   │   ├── file_parser.py   # pandas CSV/XLSX parser → aggregates dict
 │   │   └── limiter.py       # shared slowapi Limiter instance
 │   ├── routers/
@@ -437,33 +438,37 @@ The backend runs as `appuser` (UID > 1000), not `root`.
 backend/.env
 ```
 
-`backend/.env` (which contains `GROQ_API_KEY`, `RESEND_API_KEY`, etc.) is excluded from git. Only `backend/.env.example` (with placeholder values) is committed.
+`backend/.env` (which contains `GROQ_API_KEY`, `BREVO_API_KEY`, etc.) is excluded from git. Only `backend/.env.example` (with placeholder values) is committed.
 
 > **Lesson learned the hard way:** An earlier iteration accidentally committed the `.env` file. Recovery required `git rm --cached backend/.env` + `git commit --amend` + `git push --force`. Google auto-revoked the leaked Gemini key within minutes. Don't commit secrets.
 
 ---
 
-### 7. Resend API key — scoped transactional email
+### 7. Brevo API key — scoped transactional email
 
-**What it prevents:** Exposing full email account credentials. Resend API keys are scoped to sending only, easily rotatable, and don't grant access to any mailbox.
+**What it prevents:** Exposing full email account credentials. Brevo API keys are scoped to sending only, easily rotatable, and don't grant access to any mailbox.
 
 **How it's implemented** (`backend/app/email_service.py`):
 
 ```python
-import resend
-resend.api_key = os.environ["RESEND_API_KEY"]
-resend.Emails.send({...})
+import sib_api_v3_sdk
+
+configuration = sib_api_v3_sdk.Configuration()
+configuration.api_key["api-key"] = os.environ["BREVO_API_KEY"]
+api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+    sib_api_v3_sdk.ApiClient(configuration)
+)
 ```
 
-`RESEND_API_KEY` is a scoped API token from [resend.com](https://resend.com). All communication uses HTTPS — no SMTP ports needed, which also avoids port-blocking issues on platforms like Render's free tier.
+`BREVO_API_KEY` is a scoped API token from [brevo.com](https://www.brevo.com). All communication uses HTTPS — no SMTP ports needed, which avoids port-blocking issues on platforms like Render's free tier. **No custom domain required** — just verify your sender email and send to any recipient.
 
 ---
 
-### 8. Resend HTTPS transport — encrypted by default
+### 8. Brevo HTTPS transport — encrypted by default
 
-**What it prevents:** Email content being transmitted in plaintext. Unlike SMTP which requires explicit STARTTLS negotiation, Resend's HTTP API uses TLS by default.
+**What it prevents:** Email content being transmitted in plaintext. Unlike SMTP which requires explicit STARTTLS negotiation, Brevo's HTTP API uses TLS by default.
 
-**How it's implemented:** The `resend` Python SDK sends all requests over `https://api.resend.com` — encrypted end-to-end with no configuration needed.
+**How it's implemented:** The `sib-api-v3-sdk` Python SDK sends all requests over `https://api.brevo.com` — encrypted end-to-end with no configuration needed.
 
 ---
 
@@ -478,8 +483,8 @@ resend.Emails.send({...})
 | Pydantic `EmailStr`    | Bad/injected email input          | 422                       |
 | Non-root Docker user   | Container privilege escalation    | —                         |
 | `.env` in `.gitignore` | Secret leakage to git             | —                         |
-| Resend API key         | Full account credential exposure  | —                         |
-| Resend HTTPS transport | Plaintext credential transmission | —                         |
+| Brevo API key          | Full account credential exposure  | —                         |
+| Brevo HTTPS transport  | Plaintext credential transmission | —                         |
 
 ---
 

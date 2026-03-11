@@ -1,11 +1,10 @@
 import os
 
-import resend
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 
 
 async def send_email(to: str, subject: str, summary: str) -> None:
-    resend.api_key = os.environ["RESEND_API_KEY"]
-
     html_body = f"""
 <!DOCTYPE html>
 <html>
@@ -65,11 +64,24 @@ async def send_email(to: str, subject: str, summary: str) -> None:
 </html>
 """
 
-    from_addr = os.environ.get("RESEND_FROM", "Sales Insight <onboarding@resend.dev>")
+    configuration = sib_api_v3_sdk.Configuration()
+    configuration.api_key["api-key"] = os.environ["BREVO_API_KEY"]
 
-    resend.Emails.send({
-        "from": from_addr,
-        "to": [to],
-        "subject": subject,
-        "html": html_body,
-    })
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+        sib_api_v3_sdk.ApiClient(configuration)
+    )
+
+    sender_email = os.environ.get("BREVO_SENDER_EMAIL", "ayushchauhan1164@gmail.com")
+    sender_name = os.environ.get("BREVO_SENDER_NAME", "Sales Insight Automator")
+
+    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+        to=[{"email": to}],
+        sender={"name": sender_name, "email": sender_email},
+        subject=subject,
+        html_content=html_body,
+    )
+
+    try:
+        api_instance.send_transac_email(send_smtp_email)
+    except ApiException as exc:
+        raise RuntimeError(f"Brevo email failed: {exc.status} — {exc.body}") from exc

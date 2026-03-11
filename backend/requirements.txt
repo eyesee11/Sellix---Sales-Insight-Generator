@@ -4,7 +4,7 @@ python-multipart==0.0.20
 pandas==2.2.3
 openpyxl==3.1.5
 groq==0.13.1
-resend==2.23.0
+sib-api-v3-sdk==7.6.0
 slowapi==0.1.9
 pydantic[email]==2.10.3
 python-dotenv==1.0.1
