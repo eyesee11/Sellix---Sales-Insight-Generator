@@ -489,3 +489,20 @@ Port 587 with `start_tls=True` upgrades the connection to TLS before any credent
 | `.env` in `.gitignore` | Secret leakage to git             | —                         |
 | Gmail App Password     | Full account credential exposure  | —                         |
 | SMTP STARTTLS port 587 | Plaintext credential transmission | —                         |
+
+---
+
+## Sidenote — Render free tier & UptimeRobot
+
+Render's free tier spins a service **down after 15 minutes of inactivity**. The next request then triggers a cold start that takes **30–60 seconds** before the app responds. To prevent this:
+
+### UptimeRobot keep-alive (recommended — free)
+
+1. Sign up at [uptimerobot.com](https://uptimerobot.com) (free plan supports up to 50 monitors).
+2. Create a new **HTTP(s)** monitor:
+   - **Friendly name:** `sellix-backend`
+   - **URL:** `https://sellix-sales-insight-generator.onrender.com/health`
+   - **Monitoring interval:** `5 minutes`
+3. Save. UptimeRobot pings `/health` every 5 minutes, keeping the service warm 24/7.
+
+> **Note on the first-deploy "down" alert:** When you add a freshly deployed Render service to UptimeRobot, the very first ping often fires while the service is still in its initial cold-start boot (30–60 s). UptimeRobot's timeout fires before the service finishes starting, and it sends a **"service down — Connection Timeout"** alert. This is a **false positive** — not a real outage. Within a minute or two the service is up and UptimeRobot sends a recovery email. All subsequent pings (every 5 min) keep the service warm, so you won't see cold-start timeouts again.
