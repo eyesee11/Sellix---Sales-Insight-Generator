@@ -37,7 +37,7 @@ cp backend/.env.example backend/.env
 # fill in the values (see .env.example below)
 ```
 
-### 2. env.example
+### 2. .env.example
 ```
 GEMINI_API_KEY=your_gemini_api_key
 SMTP_HOST=smtp.gmail.com
