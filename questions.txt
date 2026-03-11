@@ -1,0 +1,2 @@
+why is robots.txt used in the project?
+should i include the env file in the root so that frontend can access it too
