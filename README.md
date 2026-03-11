@@ -35,6 +35,7 @@ git clone <your-repo-url>
 cd sellix
 cp backend/.env.example backend/.env
 # fill in the values (see .env.example below)
+```
 
 ### 2. env.example
 ```
