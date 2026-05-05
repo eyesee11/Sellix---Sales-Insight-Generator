@@ -8,9 +8,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# run as non-root
-RUN adduser --disabled-password --gecos "" appuser
-USER appuser
+# run as root so Render Secret Files (.env) can be read
+# RUN adduser --disabled-password --gecos "" appuser
+# USER appuser
 
 EXPOSE 8000
 
