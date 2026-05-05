@@ -1,7 +1,7 @@
 # Sales Insight Automator
 
 > Upload a `.csv` or `.xlsx` sales file, get an AI-generated executive summary delivered straight to your inbox — powered by **Groq LLaMA 3.3** and **Brevo**.
-> Built for Rabbitt AI's Cloud DevOps Engineering sprint.
+> Built for Cloud DevOps Engineering sprint.
 
 **Live:** [Frontend](https://sellix-sales-insight-generator.vercel.app) · [Swagger UI](https://sellix-sales-insight-generator.onrender.com/docs) · [ReDoc](https://sellix-sales-insight-generator.onrender.com/redoc) · [Health](https://sellix-sales-insight-generator.onrender.com/health)
 

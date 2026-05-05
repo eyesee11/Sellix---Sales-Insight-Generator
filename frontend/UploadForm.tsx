@@ -117,7 +117,7 @@ export default function UploadForm() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="exec@rabbitt.ai"
+            placeholder="exec@pragati"
             required
             className="w-full border-2 border-ink px-4 py-3 text-sm font-medium text-ink placeholder-gray-300
                        focus:outline-none focus:border-accent focus:bg-accent-light/20 bg-paper transition-colors"

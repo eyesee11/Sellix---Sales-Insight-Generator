@@ -38,8 +38,8 @@ app = FastAPI(
     ),
     version="1.1.0",
     contact={
-        "name": "Rabbitt AI — Ayush Chauhan",
-        "email": "ayushchauhan1164@gmail.com",
+        "name": "Pragati Sharma",
+        "email": "pragatisharma@gmail.com",
     },
     servers=[
         {"url": "https://sellix-sales-insight-generator.onrender.com", "description": "Production (Render)"},

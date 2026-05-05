@@ -57,7 +57,7 @@ export default function HomePage() {
               Sellix
             </span>
             <span className="hidden sm:block text-[10px] font-bold uppercase tracking-wide2 text-gray-400 border border-rule px-1.5 py-0.5 ml-1">
-              Rabbitt AI
+              Pragati
             </span>
           </a>
 
@@ -344,7 +344,7 @@ export default function HomePage() {
                   Sellix
                 </span>
                 <span className="text-[10px] font-bold uppercase tracking-wide2 text-paper/40 ml-1">
-                  by Rabbitt AI
+                  by pragati
                 </span>
               </div>
               <p className="text-[11px] text-paper/40 font-medium uppercase tracking-swiss">
@@ -383,7 +383,7 @@ export default function HomePage() {
 
           <div className="mt-8 pt-6 border-t border-paper/10 flex flex-col md:flex-row justify-between gap-2">
             <p className="text-[10px] text-paper/30 font-medium uppercase tracking-swiss">
-              © 2026 Rabbitt AI. Built for internal use.
+              © 2026 Built for internal use.
             </p>
             <p className="text-[10px] text-paper/30 font-medium uppercase tracking-swiss">
               No Gemini APIs were harmed in the making of this tool.

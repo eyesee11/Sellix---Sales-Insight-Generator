@@ -69,7 +69,7 @@ async def upload_sales_file(
         summary = generate_summary(stats)
         await send_email(
             to=str(email),
-            subject="Sales Executive Summary — Rabbitt AI",
+            subject="Sales Executive Summary",
             summary=summary,
         )
     except Exception as exc:
