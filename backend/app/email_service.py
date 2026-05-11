@@ -1,6 +1,26 @@
 import os
 import smtplib
 from email.message import EmailMessage
+from concurrent.futures import ThreadPoolExecutor
+
+_executor = ThreadPoolExecutor(max_workers=2)
+
+def _send_email_sync(to: str, subject: str, html_body: str, sender_email: str, sender_name: str, smtp_host: str, smtp_port: int, smtp_pass: str) -> None:
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = f"{sender_name} <{sender_email}>"
+    msg['To'] = to
+    msg.set_content("Please enable HTML to view this email.")
+    msg.add_alternative(html_body, subtype='html')
+
+    try:
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.starttls()
+            if smtp_pass:
+                server.login(sender_email, smtp_pass)
+            server.send_message(msg)
+    except Exception as exc:
+        raise RuntimeError(f"SMTP email failed: {exc}") from exc
 
 async def send_email(to: str, subject: str, summary: str) -> None:
     html_body = f"""
@@ -68,18 +88,14 @@ async def send_email(to: str, subject: str, summary: str) -> None:
     smtp_port = int(os.environ.get("SMTP_PORT", 587))
     smtp_pass = os.environ.get("SMTP_PASS", "")
 
-    msg = EmailMessage()
-    msg['Subject'] = subject
-    msg['From'] = f"{sender_name} <{sender_email}>"
-    msg['To'] = to
-    msg.set_content("Please enable HTML to view this email.")
-    msg.add_alternative(html_body, subtype='html')
-
+    loop = None
     try:
-        with smtplib.SMTP(smtp_host, smtp_port) as server:
-            server.starttls()
-            if smtp_pass:
-                server.login(sender_email, smtp_pass)
-            server.send_message(msg)
-    except Exception as exc:
-        raise RuntimeError(f"SMTP email failed: {exc}") from exc
+        import asyncio
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        pass
+
+    if loop:
+        await loop.run_in_executor(_executor, _send_email_sync, to, subject, html_body, sender_email, sender_name, smtp_host, smtp_port, smtp_pass)
+    else:
+        _send_email_sync(to, subject, html_body, sender_email, sender_name, smtp_host, smtp_port, smtp_pass)

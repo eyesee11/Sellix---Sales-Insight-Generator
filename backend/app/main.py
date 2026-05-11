@@ -54,12 +54,24 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("FRONTEND_URL", "http://localhost:3000").split(","),
-    allow_methods=["GET", "POST"],
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(router)
+
+
+@app.get("/", tags=["Root"], summary="Root endpoint")
+def root():
+    return {
+        "name": "Sales Insight Automator",
+        "status": "running",
+        "docs": "/docs",
+        "redoc": "/redoc",
+        "health": "/health",
+    }
 
 
 @app.get("/health", tags=["Health"], summary="Health check")
