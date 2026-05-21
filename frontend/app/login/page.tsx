@@ -32,9 +32,13 @@ export default function LoginPage() {
       const data = await res.json();
       document.cookie = `access_token=${data.access_token}; path=/; max-age=1800; samesite=strict`;
       router.push("/");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+    if (err instanceof Error) {
+        setError(err.message);
+    } else {
+        setError("Something went wrong");
     }
+}
   };
 
   return (

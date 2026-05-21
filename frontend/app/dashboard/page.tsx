@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import UploadForm from "../../UploadForm";
 import AuthNav from "../../AuthNav";
 import Image from "next/image";
@@ -10,7 +10,7 @@ import Link from "next/link";
 export default function DashboardPage() {
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [isLogged, setIsLogged] = useState(false);
-  const router = useRouter();
+//   const router = useRouter();
 
   useEffect(() => {
     const hasToken = document.cookie.includes("access_token=");

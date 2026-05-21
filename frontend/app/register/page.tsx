@@ -27,9 +27,13 @@ export default function RegisterPage() {
       }
 
       router.push("/login");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+    if (err instanceof Error) {
+        setError(err.message);
+    } else {
+        setError("Something went wrong");
     }
+}
   };
 
   return (
