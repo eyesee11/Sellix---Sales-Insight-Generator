@@ -1,5 +1,5 @@
 import Image from "next/image";
-import UploadForm from "./UploadForm";
+import AuthNav from "./AuthNav";
 
 const features = [
   {
@@ -66,7 +66,7 @@ export default function HomePage() {
             {[
               { label: "How it works", href: "#how" },
               { label: "Features", href: "#features" },
-              { label: "Upload", href: "#upload" },
+              { label: "Dashboard", href: "/dashboard" },
             ].map((l) => (
               <a
                 key={l.href}
@@ -76,6 +76,7 @@ export default function HomePage() {
                 {l.label}
               </a>
             ))}
+            <AuthNav />
           </div>
 
           {/* CTA */}
@@ -129,7 +130,7 @@ export default function HomePage() {
           {/* CTA row */}
           <div className="flex flex-wrap items-center gap-4">
             <a
-              href="#upload"
+              href="/dashboard"
               className="inline-flex items-center gap-2 bg-accent text-white font-black uppercase tracking-swiss
                          text-sm border-2 border-ink px-6 py-3.5 shadow-brutal-lg
                          hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]
@@ -279,58 +280,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── UPLOAD ─────────────────────────────────────── */}
-      <section id="upload" className="border-b-2 border-ink bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-20">
-          <div className="grid md:grid-cols-2 gap-16 items-start">
-            {/* Left copy */}
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-px w-8 bg-accent" />
-                <span className="text-[11px] font-black uppercase tracking-wide2 text-accent">
-                  Upload
-                </span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tight leading-tight mb-6">
-                Go Ahead. <br />
-                <span className="text-accent">Drop the File.</span>
-              </h2>
-              <p className="text-base text-gray-600 font-medium leading-relaxed mb-8">
-                Your sales data goes in. A polished executive summary comes out.
-                The AI does the thinking. You take the credit. This is the way.
-              </p>
-
-              <ul className="space-y-3">
-                {[
-                  "Accepts .csv and .xlsx up to 10 MB",
-                  "Revenue, units, region & category breakdowns",
-                  "Groq LLaMA 3.3 · sub-3s generation",
-                  "Delivered as a formatted HTML email",
-                  "Rate limited to keep it fair (5 req/min)",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-3 text-sm font-medium text-gray-700"
-                  >
-                    <span className="mt-0.5 w-4 h-4 bg-accent border-2 border-ink flex-shrink-0 flex items-center justify-center shadow-[1px_1px_0_#0a0a0a]">
-                      <span className="text-white text-[8px] font-black">
-                        ✓
-                      </span>
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Right form */}
-            <div>
-              <UploadForm />
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── FOOTER ─────────────────────────────────────── */}
       <footer className="bg-ink text-paper">
         <div className="max-w-7xl mx-auto px-6 py-10">
@@ -372,11 +321,11 @@ export default function HomePage() {
                 ReDoc ↗
               </a>
               <a
-                href="#upload"
+                href="/dashboard"
                 className="text-[11px] font-black uppercase tracking-swiss bg-accent border-2 border-accent
                            px-3 py-1.5 hover:bg-accent-dark transition-colors text-white"
               >
-                Back to top ↑
+                Go to Dashboard →
               </a>
             </div>
           </div>

@@ -13,9 +13,23 @@ export async function uploadFile(
   form.append("file", file);
   form.append("email", email);
 
+  // Helper to extract access_token from cookie
+  const getCookie = (name: string) => {
+    if (typeof document === 'undefined') return null;
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
+    return null;
+  };
+
+  const token = getCookie("access_token");
+
   try {
     const res = await fetch(`${API_URL}/api/v1/upload`, {
       method: "POST",
+      headers: {
+        ...(token ? { "Authorization": `Bearer ${token}` } : {})
+      },
       body: form,
     });
 

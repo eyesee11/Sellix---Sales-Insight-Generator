@@ -1,12 +1,13 @@
 import os
 
-from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile, Depends
 from pydantic import EmailStr
 
 from app.ai_service import generate_summary
 from app.email_service import send_email
 from app.file_parser import parse_file
 from app.limiter import limiter
+from app.auth import oauth2_scheme
 from schemas import UploadResponse
 
 ALLOWED_EXTENSIONS = {".csv", ".xlsx"}
@@ -50,6 +51,7 @@ async def upload_sales_file(
     request: Request,
     file: UploadFile = File(..., description="Sales data file (.csv or .xlsx, max 10 MB)"),
     email: EmailStr = Form(..., description="Recipient email for the summary"),
+    token: str = Depends(oauth2_scheme)
 ):
     # --- validate file type ---
     ext = os.path.splitext(file.filename or "")[1].lower()
@@ -72,6 +74,8 @@ async def upload_sales_file(
             subject="Sales Executive Summary",
             summary=summary,
         )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Processing failed: {exc}")
 

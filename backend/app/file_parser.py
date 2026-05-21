@@ -6,6 +6,11 @@ def parse_file(content: bytes, filename: str) -> dict:
     buf = BytesIO(content)
     df = pd.read_csv(buf) if filename.lower().endswith(".csv") else pd.read_excel(buf)
 
+    required_cols = {"Region", "Product_Category", "Revenue", "Units_Sold", "Status", "Date"}
+    missing_cols = required_cols - set(df.columns)
+    if missing_cols:
+        raise ValueError(f"Uploaded file is missing required columns: {', '.join(missing_cols)}")
+
     region_rev = df.groupby("Region")["Revenue"].sum()
     category_rev = df.groupby("Product_Category")["Revenue"].sum()
 

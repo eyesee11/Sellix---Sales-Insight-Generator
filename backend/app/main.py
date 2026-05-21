@@ -10,6 +10,11 @@ from slowapi.errors import RateLimitExceeded
 
 from app.limiter import limiter
 from routers.upload import router
+from routers.auth import router as auth_router
+from app.database import engine
+from app import models
+
+models.Base.metadata.create_all(bind=engine)
 
 load_dotenv()
 
@@ -61,6 +66,7 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(auth_router)
 
 
 @app.get("/", tags=["Root"], summary="Root endpoint")
