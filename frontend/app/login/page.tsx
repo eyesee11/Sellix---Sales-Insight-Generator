@@ -19,7 +19,7 @@ export default function LoginPage() {
       formData.append("username", email);
       formData.append("password", password);
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://sellix-sales-insight-generator.onrender.com";
       const res = await fetch(`${apiUrl}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
